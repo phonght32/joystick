@@ -5,7 +5,7 @@
 typedef struct joystick {
 	joystick_func_get_pos_x 		get_pos_x;		/*!< Function get x analog value */
 	joystick_func_get_pos_y 		get_pos_y;		/*!< Function get y analog value */
-	joystick_func_get_bt_status 	get_bt_status;	/*!< Function get button status */
+	joystick_func_get_button 		get_button;		/*!< Function get button status */
 } joystick_t;
 
 joystick_handle_t joystick_init(void)
@@ -31,7 +31,7 @@ err_code_t joystick_set_config(joystick_handle_t handle, joystick_cfg_t config)
 
 	handle->get_pos_x = config.get_pos_x;
 	handle->get_pos_y = config.get_pos_y;
-	handle->get_bt_status = config.get_bt_status;
+	handle->get_button = config.get_button;
 
 	return ERR_CODE_SUCCESS;
 }
@@ -81,7 +81,7 @@ err_code_t joystick_get_pos_y(joystick_handle_t handle, uint16_t *pos_y)
 	return ERR_CODE_SUCCESS;
 }
 
-err_code_t joystick_get_bt_status(joystick_handle_t handle, uint8_t *bt_status)
+err_code_t joystick_get_button(joystick_handle_t handle, uint8_t *button_status)
 {
 	/* Check if handle structure is NULL */
 	if (handle == NULL)
@@ -89,15 +89,15 @@ err_code_t joystick_get_bt_status(joystick_handle_t handle, uint8_t *bt_status)
 		return ERR_CODE_NULL_PTR;
 	}
 
-	if (handle->get_bt_status != NULL)
+	if (handle->get_button != NULL)
 	{
-		handle->get_bt_status(bt_status);
+		handle->get_button(button_status);
 	}
 
 	return ERR_CODE_SUCCESS;
 }
 
-err_code_t joystick_get_all(joystick_handle_t handle, uint16_t *pos_x, uint16_t *pos_y, uint8_t *bt_status)
+err_code_t joystick_get_all(joystick_handle_t handle, uint16_t *pos_x, uint16_t *pos_y, uint8_t *button_status)
 {
 	/* Check if handle structure is NULL */
 	if (handle == NULL)
@@ -115,9 +115,9 @@ err_code_t joystick_get_all(joystick_handle_t handle, uint16_t *pos_x, uint16_t 
 		handle->get_pos_y(pos_y);
 	}
 
-	if (handle->get_bt_status != NULL)
+	if (handle->get_button != NULL)
 	{
-		handle->get_bt_status(bt_status);
+		handle->get_button(button_status);
 	}
 
 	return ERR_CODE_SUCCESS;

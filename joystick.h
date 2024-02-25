@@ -31,7 +31,7 @@ extern "C" {
 
 typedef err_code_t (*joystick_func_get_pos_x)(uint16_t *pos_x);
 typedef err_code_t (*joystick_func_get_pos_y)(uint16_t *pos_y);
-typedef err_code_t (*joystick_func_get_bt_status)(uint8_t *bt_status);
+typedef err_code_t (*joystick_func_get_button)(uint8_t *button_status);
 
 /**
  * @brief   Handle structure.
@@ -41,7 +41,7 @@ typedef struct joystick *joystick_handle_t;
 typedef struct {
 	joystick_func_get_pos_x 		get_pos_x;		/*!< Function get x analog value */
 	joystick_func_get_pos_y 		get_pos_y;		/*!< Function get y analog value */
-	joystick_func_get_bt_status 	get_bt_status;	/*!< Function get button status */
+	joystick_func_get_button 		get_button;		/*!< Function get button status */
 } joystick_cfg_t;
 
 /*
@@ -108,13 +108,13 @@ err_code_t joystick_get_pos_y(joystick_handle_t handle, uint16_t *pos_y);
  * @brief   Get current button status.
  *
  * @param   handle Handle structure.
- * @param   bt_status Button status.
+ * @param   button_status Button status.
  *
  * @return
  *      - ERR_CODE_SUCCESS: Success.
  *      - Others:           Fail.
  */
-err_code_t joystick_get_bt_status(joystick_handle_t handle, uint8_t *bt_status);
+err_code_t joystick_get_button(joystick_handle_t handle, uint8_t *button_status);
 
 /**
  * @brief   Get current button status.
@@ -122,13 +122,13 @@ err_code_t joystick_get_bt_status(joystick_handle_t handle, uint8_t *bt_status);
  * @param   handle Handle structure.
  * @param   x Position x.
  * @param   y Position y.
- * @param   bt_status Button status.
+ * @param   button_status Button status.
  *
  * @return
  *      - ERR_CODE_SUCCESS: Success.
  *      - Others:           Fail.
  */
-err_code_t joystick_get_all(joystick_handle_t handle, uint16_t *pos_x, uint16_t *pos_y, uint8_t *bt_status);
+err_code_t joystick_get_all(joystick_handle_t handle, uint16_t *pos_x, uint16_t *pos_y, uint8_t *button_status);
 
 #ifdef __cplusplus
 }
