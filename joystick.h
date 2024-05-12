@@ -39,6 +39,8 @@ typedef err_code_t (*joystick_func_get_button)(uint8_t *button_status);
 typedef struct joystick *joystick_handle_t;
 
 typedef struct {
+	int16_t  						bias_x;			/*!< Bias value for x position */
+	int16_t  						bias_y;			/*!< Bias value for y position */
 	joystick_func_get_pos_x 		get_pos_x;		/*!< Function get x analog value */
 	joystick_func_get_pos_y 		get_pos_y;		/*!< Function get y analog value */
 	joystick_func_get_button 		get_button;		/*!< Function get button status */
@@ -81,7 +83,7 @@ err_code_t joystick_set_config(joystick_handle_t handle, joystick_cfg_t config);
 err_code_t joystick_config(joystick_handle_t handle);
 
 /**
- * @brief   Get current x position.
+ * @brief   Get raw current x position.
  *
  * @param   handle Handle structure.
  * @param   x Position x.
@@ -90,10 +92,10 @@ err_code_t joystick_config(joystick_handle_t handle);
  *      - ERR_CODE_SUCCESS: Success.
  *      - Others:           Fail.
  */
-err_code_t joystick_get_pos_x(joystick_handle_t handle, uint16_t *pos_x);
+err_code_t joystick_get_pos_x_raw(joystick_handle_t handle, uint16_t *pos_x);
 
 /**
- * @brief   Get current y position.
+ * @brief   Get raw current y position.
  *
  * @param   handle Handle structure.
  * @param   y Position y.
@@ -102,7 +104,31 @@ err_code_t joystick_get_pos_x(joystick_handle_t handle, uint16_t *pos_x);
  *      - ERR_CODE_SUCCESS: Success.
  *      - Others:           Fail.
  */
-err_code_t joystick_get_pos_y(joystick_handle_t handle, uint16_t *pos_y);
+err_code_t joystick_get_pos_y_raw(joystick_handle_t handle, uint16_t *pos_y);
+
+/**
+ * @brief   Get calibrated current x position.
+ *
+ * @param   handle Handle structure.
+ * @param   x Position x.
+ *
+ * @return
+ *      - ERR_CODE_SUCCESS: Success.
+ *      - Others:           Fail.
+ */
+err_code_t joystick_get_pos_x_calib(joystick_handle_t handle, int16_t *pos_x);
+
+/**
+ * @brief   Get calibrated current y position.
+ *
+ * @param   handle Handle structure.
+ * @param   y Position y.
+ *
+ * @return
+ *      - ERR_CODE_SUCCESS: Success.
+ *      - Others:           Fail.
+ */
+err_code_t joystick_get_pos_y_calib(joystick_handle_t handle, int16_t *pos_y);
 
 /**
  * @brief   Get current button status.
@@ -117,18 +143,17 @@ err_code_t joystick_get_pos_y(joystick_handle_t handle, uint16_t *pos_y);
 err_code_t joystick_get_button(joystick_handle_t handle, uint8_t *button_status);
 
 /**
- * @brief   Get current button status.
+ * @brief   Set bias data.
  *
  * @param   handle Handle structure.
- * @param   x Position x.
- * @param   y Position y.
- * @param   button_status Button status.
+ * @param   bias_x Bias x.
+ * @param   bias_y Bias y.
  *
  * @return
  *      - ERR_CODE_SUCCESS: Success.
  *      - Others:           Fail.
  */
-err_code_t joystick_get_all(joystick_handle_t handle, uint16_t *pos_x, uint16_t *pos_y, uint8_t *button_status);
+err_code_t joystick_set_bias(joystick_handle_t handle, int16_t bias_x, int16_t bias_y);
 
 #ifdef __cplusplus
 }
