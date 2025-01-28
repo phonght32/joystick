@@ -3,12 +3,37 @@
 #include "joystick.h"
 
 typedef struct joystick {
-	int16_t  						bias_x;			/*!< Bias value for x position */
-	int16_t  						bias_y;			/*!< Bias value for y position */
-	joystick_func_get_pos_x 		get_pos_x;		/*!< Function get x analog value */
-	joystick_func_get_pos_y 		get_pos_y;		/*!< Function get y analog value */
-	joystick_func_get_button 		get_button;		/*!< Function get button status */
+	int16_t 					min_acceptable_raw_x; 	/*!< Min acceptable raw value */
+	int16_t 					max_acceptable_raw_x; 	/*!< Max acceptable raw value */
+	int16_t 					min_scale_x;  			/*!< Min value after converting */
+	int16_t 					max_scale_x;  			/*!< Max value after converting */
+	int16_t 					min_acceptable_raw_y; 	/*!< Min acceptable raw value */
+	int16_t 					max_acceptable_raw_y; 	/*!< Max acceptable raw value */
+	int16_t 					min_scale_y;  			/*!< Min value after converting */
+	int16_t 					max_scale_y;  			/*!< Max value after converting */
+	joystick_func_get_pos_x 	get_pos_x;				/*!< Function get x analog value */
+	joystick_func_get_pos_y 	get_pos_y;				/*!< Function get y analog value */
+	joystick_func_get_button 	get_button;				/*!< Function get button status */
 } joystick_t;
+
+static int16_t joystick_constrain(int16_t value, int16_t max, int16_t min)
+{
+	int16_t temp_data;
+	if (value > max)
+	{
+		temp_data = max;
+	}
+	else if (value < min)
+	{
+		temp_data = min;
+	}
+	else
+	{
+		temp_data = value;
+	}
+
+	return temp_data;
+}
 
 joystick_handle_t joystick_init(void)
 {
@@ -31,9 +56,17 @@ err_code_t joystick_set_config(joystick_handle_t handle, joystick_cfg_t config)
 		return ERR_CODE_NULL_PTR;
 	}
 
-	handle->get_pos_x = config.get_pos_x;
-	handle->get_pos_y = config.get_pos_y;
-	handle->get_button = config.get_button;
+	handle->min_acceptable_raw_x 	= config.min_acceptable_raw_x;
+	handle->max_acceptable_raw_x 	= config.max_acceptable_raw_x;
+	handle->min_scale_x 			= config.min_scale_x;
+	handle->max_scale_x 			= config.max_scale_x;
+	handle->min_acceptable_raw_y 	= config.min_acceptable_raw_y;
+	handle->max_acceptable_raw_y 	= config.max_acceptable_raw_y;
+	handle->min_scale_y 			= config.min_scale_y;
+	handle->max_scale_y 			= config.max_scale_y;
+	handle->get_pos_x 				= config.get_pos_x;
+	handle->get_pos_y 				= config.get_pos_y;
+	handle->get_button 				= config.get_button;
 
 	return ERR_CODE_SUCCESS;
 }
@@ -83,7 +116,7 @@ err_code_t joystick_get_pos_y_raw(joystick_handle_t handle, uint16_t *pos_y)
 	return ERR_CODE_SUCCESS;
 }
 
-err_code_t joystick_get_pos_x_calib(joystick_handle_t handle, int16_t *pos_x)
+err_code_t joystick_get_pos_x_scale(joystick_handle_t handle, int16_t *pos_x)
 {
 	/* Check if handle structure is NULL */
 	if (handle == NULL)
@@ -92,18 +125,34 @@ err_code_t joystick_get_pos_x_calib(joystick_handle_t handle, int16_t *pos_x)
 	}
 
 	uint16_t raw_pos_x;
+	int16_t old_value, old_min, old_max, new_value, new_min, new_max;
 
 	if (handle->get_pos_x != NULL)
 	{
 		handle->get_pos_x(&raw_pos_x);
 	}
 
-	*pos_x = raw_pos_x - handle->bias_x;
+	old_value = (int16_t)joystick_constrain(raw_pos_x, handle->max_acceptable_raw_x, handle->min_acceptable_raw_x);
+	old_min = handle->min_acceptable_raw_x;
+	old_max = handle->max_acceptable_raw_x;
+	new_min = handle->min_scale_x;
+	new_max = handle->max_scale_x;
+
+	if ((old_max - old_min) > 0)
+	{
+		new_value = ((float)(old_value - old_min) / (float)(old_max - old_min) ) * (new_max - new_min) + new_min;
+	}
+	else
+	{
+		new_value = old_value;
+	}
+
+	*pos_x = new_value;
 
 	return ERR_CODE_SUCCESS;
 }
 
-err_code_t joystick_get_pos_y_calib(joystick_handle_t handle, int16_t *pos_y)
+err_code_t joystick_get_pos_y_scale(joystick_handle_t handle, int16_t *pos_y)
 {
 	/* Check if handle structure is NULL */
 	if (handle == NULL)
@@ -112,13 +161,29 @@ err_code_t joystick_get_pos_y_calib(joystick_handle_t handle, int16_t *pos_y)
 	}
 
 	uint16_t raw_pos_y;
+	int16_t old_value, old_min, old_max, new_value, new_min, new_max;
 
 	if (handle->get_pos_y != NULL)
 	{
 		handle->get_pos_y(&raw_pos_y);
 	}
 
-	*pos_y = raw_pos_y - handle->bias_y;
+	old_value = (int16_t)joystick_constrain(raw_pos_y, handle->max_acceptable_raw_y, handle->min_acceptable_raw_y);
+	old_min = handle->min_acceptable_raw_y;
+	old_max = handle->max_acceptable_raw_y;
+	new_min = handle->min_scale_y;
+	new_max = handle->max_scale_y;
+
+	if ((old_max - old_min) > 0)
+	{
+		new_value = ((float)(old_value - old_min) / (float)(old_max - old_min) ) * (new_max - new_min) + new_min;
+	}
+	else
+	{
+		new_value = old_value;
+	}
+
+	*pos_y = new_value;
 
 	return ERR_CODE_SUCCESS;
 }
@@ -135,20 +200,6 @@ err_code_t joystick_get_button(joystick_handle_t handle, uint8_t *button_status)
 	{
 		handle->get_button(button_status);
 	}
-
-	return ERR_CODE_SUCCESS;
-}
-
-err_code_t joystick_set_bias(joystick_handle_t handle, int16_t bias_x, int16_t bias_y)
-{
-	/* Check if handle structure is NULL */
-	if (handle == NULL)
-	{
-		return ERR_CODE_NULL_PTR;
-	}
-
-	handle->bias_x = bias_x;
-	handle->bias_y = bias_y;
 
 	return ERR_CODE_SUCCESS;
 }
