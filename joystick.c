@@ -7,10 +7,12 @@ typedef struct joystick {
 	int16_t 					max_acceptable_raw_x; 	/*!< Max acceptable raw value */
 	int16_t 					min_scale_x;  			/*!< Min value after converting */
 	int16_t 					max_scale_x;  			/*!< Max value after converting */
+	uint8_t 					inverse_x;  			/*!< Inverse x axis*/
 	int16_t 					min_acceptable_raw_y; 	/*!< Min acceptable raw value */
 	int16_t 					max_acceptable_raw_y; 	/*!< Max acceptable raw value */
 	int16_t 					min_scale_y;  			/*!< Min value after converting */
 	int16_t 					max_scale_y;  			/*!< Max value after converting */
+	uint8_t 					inverse_y;  			/*!< Inverse y axis*/
 	joystick_func_get_pos_x 	get_pos_x;				/*!< Function get x analog value */
 	joystick_func_get_pos_y 	get_pos_y;				/*!< Function get y analog value */
 	joystick_func_get_button 	get_button;				/*!< Function get button status */
@@ -60,10 +62,12 @@ err_code_t joystick_set_config(joystick_handle_t handle, joystick_cfg_t config)
 	handle->max_acceptable_raw_x 	= config.max_acceptable_raw_x;
 	handle->min_scale_x 			= config.min_scale_x;
 	handle->max_scale_x 			= config.max_scale_x;
+	handle->inverse_x  				= config.inverse_x;
 	handle->min_acceptable_raw_y 	= config.min_acceptable_raw_y;
 	handle->max_acceptable_raw_y 	= config.max_acceptable_raw_y;
 	handle->min_scale_y 			= config.min_scale_y;
 	handle->max_scale_y 			= config.max_scale_y;
+	handle->inverse_y  				= config.inverse_y;
 	handle->get_pos_x 				= config.get_pos_x;
 	handle->get_pos_y 				= config.get_pos_y;
 	handle->get_button 				= config.get_button;
@@ -147,7 +151,14 @@ err_code_t joystick_get_pos_x_scale(joystick_handle_t handle, int16_t *pos_x)
 		new_value = old_value;
 	}
 
-	*pos_x = new_value;
+	if (handle->inverse_x == 1)
+	{
+		*pos_x = new_max - new_value;
+	}
+	else
+	{
+		*pos_x = new_value;
+	}
 
 	return ERR_CODE_SUCCESS;
 }
@@ -183,7 +194,14 @@ err_code_t joystick_get_pos_y_scale(joystick_handle_t handle, int16_t *pos_y)
 		new_value = old_value;
 	}
 
-	*pos_y = new_value;
+	if (handle->inverse_y == 1)
+	{
+		*pos_y = new_max - new_value;
+	}
+	else
+	{
+		*pos_y = new_value;
+	}
 
 	return ERR_CODE_SUCCESS;
 }

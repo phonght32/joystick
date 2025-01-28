@@ -43,10 +43,12 @@ typedef struct {
 	int16_t 					max_acceptable_raw_x; 	/*!< Max acceptable raw value */
 	int16_t 					min_scale_x;  			/*!< Min value after converting */
 	int16_t 					max_scale_x;  			/*!< Max value after converting */
+	uint8_t 					inverse_x;  			/*!< Inverse x axis*/
 	int16_t 					min_acceptable_raw_y; 	/*!< Min acceptable raw value */
 	int16_t 					max_acceptable_raw_y; 	/*!< Max acceptable raw value */
 	int16_t 					min_scale_y;  			/*!< Min value after converting */
 	int16_t 					max_scale_y;  			/*!< Max value after converting */
+	uint8_t 					inverse_y;  			/*!< Inverse y axis*/
 	joystick_func_get_pos_x 	get_pos_x;				/*!< Function get x analog value */
 	joystick_func_get_pos_y 	get_pos_y;				/*!< Function get y analog value */
 	joystick_func_get_button 	get_button;				/*!< Function get button status */
