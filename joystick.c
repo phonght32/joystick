@@ -153,7 +153,7 @@ err_code_t joystick_get_pos_x_scale(joystick_handle_t handle, int16_t *pos_x)
 
 	if (handle->inverse_x == 1)
 	{
-		*pos_x = new_max - new_value;
+		*pos_x = new_max + new_min - new_value;
 	}
 	else
 	{
@@ -196,7 +196,7 @@ err_code_t joystick_get_pos_y_scale(joystick_handle_t handle, int16_t *pos_y)
 
 	if (handle->inverse_y == 1)
 	{
-		*pos_y = new_max - new_value;
+		*pos_y = new_max + new_min - new_value;
 	}
 	else
 	{
